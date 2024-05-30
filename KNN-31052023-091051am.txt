@@ -1,0 +1,43 @@
+import numpy as np
+
+# Define the dataset
+data = [
+    ['00101', 'A'],
+    ['10111', 'A'],
+    ['11010', 'B'],
+    ['01100', 'B'],
+    ['00111', 'A'],
+    ['11100', 'B']
+]
+
+# Separate features and labels
+features = np.array([row[:-1] for row in data])
+labels = np.array([row[-1] for row in data])
+
+# Define function to calculate Hamming distance
+def hamming_distance(instance1, instance2):
+    distance = sum(el1 != el2 for el1, el2 in zip(instance1, instance2))
+    return distance
+
+# Define function to classify new instance using KNN
+def knn_classify(k, train_features, train_labels, test_instance):
+    distances = []
+    # Calculate Hamming distance between test instance and each training instance
+    for i in range(len(train_features)):
+        dist = hamming_distance(train_features[i], test_instance)
+        distances.append((dist, train_labels[i]))
+    # Sort distances in ascending order
+    distances.sort(key=lambda x: x[0])
+    # Select k nearest neighbors
+    k_nearest = distances[:k]
+    labels = [neighbor[1] for neighbor in k_nearest]
+    # Perform majority voting to determine predicted label
+    majority_vote = max(set(labels), key=labels.count)
+    return majority_vote
+
+# Test the KNN classifier
+k = 2
+test_instance = '00110'
+# test_instance = np.array(['Small', 'Red', 'Circle'])
+predicted_label = knn_classify(k, features, labels, test_instance)
+print("Predicted Label:", predicted_label)
